@@ -1,8 +1,20 @@
 <Solution>
-  <Project Path="Entravel.API/Entravel.API.csproj" />
-  <Project Path="Entravel.Application/Entravel.Application.csproj" />
-  <Project Path="Entravel.Contracts/Entravel.Contracts.csproj" />
-  <Project Path="Entravel.Data/Entravel.Data.csproj" />
-  <Project Path="Entravel.Domain/Entravel.Domain.csproj" />
-  <Project Path="Entravel.EF/Entravel.EF.csproj" />
+  <Folder Name="/API/">
+    <Project Path="Entravel.API/Entravel.API.csproj" />
+  </Folder>
+  <Folder Name="/Application/">
+    <Project Path="Entravel.Application/Entravel.Application.csproj" />
+    <Project Path="Entravel.Contracts/Entravel.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/Data/">
+    <Project Path="Entravel.Data/Entravel.Data.csproj" />
+  </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="Entravel.Domain/Entravel.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Entravel.EF/Entravel.EF.csproj" />
+    <Project Path="Entravel.Rmq/Entravel.Messaging.csproj" Id="704c6855-fdd9-415b-97dc-af484ad89cce" />
+  </Folder>
+  <Folder Name="/Jobs/" />
 </Solution>
