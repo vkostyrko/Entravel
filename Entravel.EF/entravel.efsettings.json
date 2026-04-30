@@ -1,0 +1,6 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=entravel;Username=postgres;Password=postgres"
+  }
+}
+

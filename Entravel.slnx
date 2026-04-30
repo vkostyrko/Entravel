@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="Entravel.API/Entravel.API.csproj" />
+  <Project Path="Entravel.Application/Entravel.Application.csproj" />
+  <Project Path="Entravel.Contracts/Entravel.Contracts.csproj" />
+  <Project Path="Entravel.Data/Entravel.Data.csproj" />
+  <Project Path="Entravel.Domain/Entravel.Domain.csproj" />
+  <Project Path="Entravel.EF/Entravel.EF.csproj" />
+</Solution>
