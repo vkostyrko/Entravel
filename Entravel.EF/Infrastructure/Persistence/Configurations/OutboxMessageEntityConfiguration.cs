@@ -1,16 +1,16 @@
-using Entravel.Domain.Outbox;
+using Entravel.EF.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Entravel.EF.Configurations;
+namespace Entravel.EF.Infrastructure.Persistence.Configurations;
 
-public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage>
+internal sealed class OutboxMessageEntityConfiguration : IEntityTypeConfiguration<OutboxMessageEntity>
 {
     private const int TypeMaxLength = 256;
     private const int PayloadMaxLength = 8000;
     private const int LastErrorMaxLength = 4000;
 
-    public void Configure(EntityTypeBuilder<OutboxMessage> builder)
+    public void Configure(EntityTypeBuilder<OutboxMessageEntity> builder)
     {
         builder.ToTable("OutboxMessages");
 
@@ -51,4 +51,3 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
         builder.HasIndex(outboxMessage => outboxMessage.Status);
     }
 }
-

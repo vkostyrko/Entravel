@@ -1,12 +1,12 @@
-using Entravel.Domain.Orders;
+using Entravel.EF.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Entravel.EF.Configurations;
+namespace Entravel.EF.Infrastructure.Persistence.Configurations;
 
-public sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
+internal sealed class OrderItemEntityConfiguration : IEntityTypeConfiguration<OrderItemEntity>
 {
-    public void Configure(EntityTypeBuilder<OrderItem> builder)
+    public void Configure(EntityTypeBuilder<OrderItemEntity> builder)
     {
         builder.ToTable("OrderItems");
 
@@ -39,9 +39,8 @@ public sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             .HasForeignKey(orderItem => orderItem.OrderId);
 
         builder.HasOne(orderItem => orderItem.Inventory)
-            .WithMany()
+            .WithMany(inventory => inventory.OrderItems)
             .HasForeignKey(orderItem => orderItem.InventoryId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
-

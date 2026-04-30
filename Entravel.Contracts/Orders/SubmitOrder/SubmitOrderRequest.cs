@@ -1,6 +1,7 @@
 namespace Entravel.Contracts.Orders.SubmitOrder;
 
 public sealed record SubmitOrderRequest(
-    string CustomerId,
-    IReadOnlyList<OrderItemRequest> Items);
+    Guid CustomerId,
+    IReadOnlyList<OrderItemRequest> Items,
+    decimal TotalAmount);
 

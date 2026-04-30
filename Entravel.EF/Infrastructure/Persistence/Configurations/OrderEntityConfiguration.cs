@@ -1,12 +1,12 @@
-using Entravel.Domain.Orders;
+using Entravel.EF.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Entravel.EF.Configurations;
+namespace Entravel.EF.Infrastructure.Persistence.Configurations;
 
-public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
+internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderEntity>
 {
-    public void Configure(EntityTypeBuilder<Order> builder)
+    public void Configure(EntityTypeBuilder<OrderEntity> builder)
     {
         builder.ToTable("Orders");
 
@@ -40,4 +40,3 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasIndex(order => order.Status);
     }
 }
-

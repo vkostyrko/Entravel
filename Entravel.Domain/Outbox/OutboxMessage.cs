@@ -2,7 +2,7 @@ using Entravel.Domain.Common;
 
 namespace Entravel.Domain.Outbox;
 
-public sealed class OutboxMessage : BaseEntity
+public sealed class OutboxMessage : BaseDomainModel
 {
     public required string Type { get; set; }
     public required string Payload { get; set; }

@@ -6,5 +6,6 @@ public static class ValidationMessages
     public const string ItemsRequired = "Items are required.";
     public const string ItemInventoryIdRequired = "Item InventoryId is required.";
     public const string ItemQuantityMustBePositive = "Item Quantity must be greater than 0.";
+    public const string TotalAmountMustBePositive = "TotalAmount must be greater than 0.";
 }
 

@@ -5,6 +5,8 @@ namespace Entravel.API.Validation;
 
 public sealed class SubmitOrderRequestValidator : AbstractValidator<SubmitOrderRequest>
 {
+    private const decimal MinTotalAmount = 0.01m;
+
     public SubmitOrderRequestValidator()
     {
         RuleFor(request => request.CustomerId)
@@ -15,6 +17,9 @@ public sealed class SubmitOrderRequestValidator : AbstractValidator<SubmitOrderR
 
         RuleForEach(request => request.Items)
             .SetValidator(new OrderItemRequestValidator());
+
+        RuleFor(request => request.TotalAmount)
+            .GreaterThanOrEqualTo(MinTotalAmount);
     }
 }
 

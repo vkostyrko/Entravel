@@ -1,6 +1,6 @@
 using Entravel.API.ExceptionHandlers;
 using Entravel.Application.Orders.SubmitOrder;
-using Entravel.API.Mapping;
+using Entravel.API.Startup;
 using Entravel.API.Validation;
 using Entravel.EF.Dependencies;
 using FluentValidation;
@@ -18,8 +18,8 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Su
 builder.Services.AddValidatorsFromAssemblyContaining<SubmitOrderCommand>();
 builder.Services.AddValidatorsFromAssemblyContaining<SubmitOrderRequestValidator>();
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.ConfigureMappings();
 builder.Services.AddEfInfrastructure();
-builder.Services.AddAutoMapper(typeof(OrderMappingProfile).Assembly);
 
 var app = builder.Build();
 

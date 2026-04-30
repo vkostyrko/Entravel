@@ -1,12 +1,12 @@
-using Entravel.Domain.Inventory;
+using Entravel.EF.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Entravel.EF.Configurations;
+namespace Entravel.EF.Infrastructure.Persistence.Configurations;
 
-public sealed class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
+internal sealed class InventoryEntityConfiguration : IEntityTypeConfiguration<InventoryEntity>
 {
-    public void Configure(EntityTypeBuilder<Inventory> builder)
+    public void Configure(EntityTypeBuilder<InventoryEntity> builder)
     {
         builder.ToTable("Inventory");
 
@@ -33,4 +33,3 @@ public sealed class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
             .IsRequired();
     }
 }
-

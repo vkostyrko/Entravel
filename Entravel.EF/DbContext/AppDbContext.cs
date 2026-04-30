@@ -1,16 +1,14 @@
+using Entravel.EF.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
-using Entravel.Domain.Inventory;
-using Entravel.Domain.Orders;
-using Entravel.Domain.Outbox;
 
 namespace Entravel.EF.DbContext;
 
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Microsoft.EntityFrameworkCore.DbContext(options)
 {
-    public DbSet<Order> Orders => Set<Order>();
-    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
-    public DbSet<Inventory> Inventory => Set<Inventory>();
-    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+    internal DbSet<OrderEntity> Orders => Set<OrderEntity>();
+    internal DbSet<OrderItemEntity> OrderItems => Set<OrderItemEntity>();
+    internal DbSet<InventoryEntity> Inventory => Set<InventoryEntity>();
+    internal DbSet<OutboxMessageEntity> OutboxMessages => Set<OutboxMessageEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,4 +16,3 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Micro
         base.OnModelCreating(modelBuilder);
     }
 }
-

@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Entravel.Common\Entravel.Common.csproj" />
     <ProjectReference Include="..\Entravel.Domain\Entravel.Domain.csproj" />
     <ProjectReference Include="..\Entravel.Data\Entravel.Data.csproj" />
   </ItemGroup>

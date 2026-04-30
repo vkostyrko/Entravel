@@ -6,6 +6,7 @@ namespace Entravel.Application.Orders.SubmitOrder;
 public sealed class SubmitOrderCommandValidator : AbstractValidator<SubmitOrderCommand>
 {
     private const int MinQuantity = 1;
+    private const decimal MinTotalAmount = 0.01m;
 
     public SubmitOrderCommandValidator()
     {
@@ -27,6 +28,10 @@ public sealed class SubmitOrderCommandValidator : AbstractValidator<SubmitOrderC
                 .GreaterThanOrEqualTo(MinQuantity)
                 .WithMessage(ValidationMessages.ItemQuantityMustBePositive);
         });
+
+        RuleFor(command => command.TotalAmount)
+            .GreaterThanOrEqualTo(MinTotalAmount)
+            .WithMessage(ValidationMessages.TotalAmountMustBePositive);
     }
 }
 

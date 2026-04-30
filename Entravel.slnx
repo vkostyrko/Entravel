@@ -17,4 +17,5 @@
     <Project Path="Entravel.Rmq/Entravel.Messaging.csproj" Id="704c6855-fdd9-415b-97dc-af484ad89cce" />
   </Folder>
   <Folder Name="/Jobs/" />
+  <Project Path="Entravel.Common/Entravel.Common.csproj" />
 </Solution>

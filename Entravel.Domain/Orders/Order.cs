@@ -2,7 +2,7 @@ using Entravel.Domain.Common;
 
 namespace Entravel.Domain.Orders;
 
-public sealed class Order : BaseEntity
+public sealed class Order : BaseDomainModel
 {
     public Guid CustomerId { get; set; }
     public decimal TotalAmount { get; set; }

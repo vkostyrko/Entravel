@@ -3,6 +3,7 @@ using System;
 using Entravel.EF.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entravel.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430212746_PersistenceEntitiesSplit")]
+    partial class PersistenceEntitiesSplit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Entravel.EF.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Entravel.Domain.Inventory.Inventory", b =>
+            modelBuilder.Entity("Entravel.EF.Infrastructure.Persistence.Entities.InventoryEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -50,7 +53,7 @@ namespace Entravel.EF.Migrations
                     b.ToTable("Inventory", (string)null);
                 });
 
-            modelBuilder.Entity("Entravel.Domain.Orders.Order", b =>
+            modelBuilder.Entity("Entravel.EF.Infrastructure.Persistence.Entities.OrderEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -80,7 +83,7 @@ namespace Entravel.EF.Migrations
                     b.ToTable("Orders", (string)null);
                 });
 
-            modelBuilder.Entity("Entravel.Domain.Orders.OrderItem", b =>
+            modelBuilder.Entity("Entravel.EF.Infrastructure.Persistence.Entities.OrderItemEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -113,7 +116,7 @@ namespace Entravel.EF.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
-            modelBuilder.Entity("Entravel.Domain.Outbox.OutboxMessage", b =>
+            modelBuilder.Entity("Entravel.EF.Infrastructure.Persistence.Entities.OutboxMessageEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -156,15 +159,15 @@ namespace Entravel.EF.Migrations
                     b.ToTable("OutboxMessages", (string)null);
                 });
 
-            modelBuilder.Entity("Entravel.Domain.Orders.OrderItem", b =>
+            modelBuilder.Entity("Entravel.EF.Infrastructure.Persistence.Entities.OrderItemEntity", b =>
                 {
-                    b.HasOne("Entravel.Domain.Inventory.Inventory", "Inventory")
-                        .WithMany()
+                    b.HasOne("Entravel.EF.Infrastructure.Persistence.Entities.InventoryEntity", "Inventory")
+                        .WithMany("OrderItems")
                         .HasForeignKey("InventoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entravel.Domain.Orders.Order", "Order")
+                    b.HasOne("Entravel.EF.Infrastructure.Persistence.Entities.OrderEntity", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -175,7 +178,12 @@ namespace Entravel.EF.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Entravel.Domain.Orders.Order", b =>
+            modelBuilder.Entity("Entravel.EF.Infrastructure.Persistence.Entities.InventoryEntity", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("Entravel.EF.Infrastructure.Persistence.Entities.OrderEntity", b =>
                 {
                     b.Navigation("Items");
                 });
