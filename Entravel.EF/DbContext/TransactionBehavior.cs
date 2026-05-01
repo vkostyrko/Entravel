@@ -19,7 +19,7 @@ public sealed class TransactionBehavior<TRequest, TResponse>(AppDbContext appDbC
 
         try
         {
-            var response = await next();
+            var response = await next(cancellationToken);
             await appDbContext.SaveChangesAsync(cancellationToken);
             await tx.CommitAsync(cancellationToken);
             return response;

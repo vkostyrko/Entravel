@@ -49,12 +49,9 @@ public sealed class SubmitOrderCommandHandler(
     }
 
     private static OutboxMessage CreateOutboxMessage(Guid orderId, DateTime now) =>
-        new()
-        {
-            Id = Guid.NewGuid(),
-            Type = MessageTypes.OrderSubmitted,
-            Payload = JsonSerializer.Serialize(new { OrderId = orderId }),
-            Status = OutboxMessageStatus.New,
-            CreatedDate = now
-        };
+        OutboxMessage.CreateNew(
+            id: Guid.NewGuid(),
+            type: MessageTypes.OrderSubmitted,
+            payload: JsonSerializer.Serialize(new { OrderId = orderId }),
+            utcNow: now);
 }
