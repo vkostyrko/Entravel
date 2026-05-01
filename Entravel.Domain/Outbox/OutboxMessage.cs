@@ -8,12 +8,12 @@ public sealed class OutboxMessage : BaseDomainModel
     {
     }
 
-    public required string Type { get; set; }
-    public required string Payload { get; set; }
-    public OutboxMessageStatus Status { get; set; }
-    public int RetryCount { get; set; }
-    public string? LastError { get; set; }
-    public DateTime? SentDate { get; set; }
+    public string Type { get; private set; } = string.Empty;
+    public string Payload { get; private set; } = string.Empty;
+    public OutboxMessageStatus Status { get; private set; }
+    public int RetryCount { get; private set; }
+    public string? LastError { get; private set; }
+    public DateTime? SentDate { get; private set; }
 
     public static OutboxMessage CreateNew(Guid id, string type, string payload, DateTime utcNow)
     {
