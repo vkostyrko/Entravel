@@ -31,7 +31,7 @@ docker compose up --build
 
 Expected:
 
-- Initially it may be `Pending` / `Processing`
+- Initially the order will be `Pending`
 - After a moment it should become `Processed`
 - `TotalAmount = 100`
 - `Discount = 10`
@@ -56,7 +56,7 @@ docker compose down -v
 
 When `ASPNETCORE_ENVIRONMENT` is `Docker` (or `Development` / `Local`):
 
-- **API** (`InitializeAsync`): applies EF Core migrations on startup, then seeds local-only `Customers` and `Inventory` (idempotent; container restarts won’t duplicate data).
+- **API** (`InitializeAsync`): applies EF Core migrations on startup, then seeds local-only `Customers` and `Inventory` (idempotent; container restarts won't duplicate data).
 - **Outbox Worker** (`ApplyMigrationsAsync` only): applies migrations on startup so the schema exists; it does **not** seed test data.
 - **Order Processing Worker** (`ApplyMigrationsAsync` only): same migration-only startup as the outbox worker.
 
@@ -66,8 +66,8 @@ When `ASPNETCORE_ENVIRONMENT` is `Docker` (or `Development` / `Local`):
 2. **API** stores a new `Order` (status `Pending`) and an `OutboxMessage` in **PostgreSQL in one transaction**.
 3. **Outbox Worker** **polls** the `OutboxMessages` table, claims rows, publishes `OrderSubmitted` JSON to RabbitMQ exchange **`entravel.events`** (type **topic**, routing key **`orders.submitted`**), then marks the outbox row **`Sent`** when publish succeeds.
 4. **Order Processing Worker** does **not** poll RabbitMQ. It hosts an **event-driven** `AsyncEventingBasicConsumer`: RabbitMQ **pushes** deliveries as soon as messages arrive on queue **`entravel.order-processing`** (bound to `entravel.events` with routing key `orders.submitted`). This is analogous to a queue-triggered **Azure Function** staying alive and reacting to each delivery.
-5. The worker’s **dispatcher** routes by message type (`OrderSubmitted` from the AMQP `type` property and/or subscription config) to **`OrderSubmittedMessageHandler`**.
-6. The handler runs **business logic** (simulated delay, validation) via **`IOrderProcessingRepository`**. The repository loads the order and calls **domain behavior** (no direct property mutation) to move the order **`Pending` → `Processing` → `Processed`** (with **`UpdatedDate`** set). A row lock (`SELECT ... FOR UPDATE`) is used so only one concurrent consumer processes a given order at a time.
+5. The worker's **dispatcher** routes by message type (`OrderSubmitted` from the AMQP `type` property and/or subscription config) to **`OrderSubmittedMessageHandler`**.
+6. The handler runs **business logic** (simulated delay, validation) via **`IOrderProcessingRepository`**. The repository loads the order and calls **domain behavior** (no direct property mutation) to move the order **`Pending` → `Processed`** (with **`UpdatedDate`** set). A row lock (`SELECT ... FOR UPDATE`) is used so only one concurrent consumer processes a given order at a time.
 7. The RabbitMQ message is **acknowledged only after** the database outcome is known (success, already processed, or poison path). Transient failures use **nack + requeue**; invalid JSON / unknown type / missing order (poison) use **nack without requeue**.
 
 **Delivery note:** RabbitMQ delivery is **at-least-once**. The outbox publisher can also retry and duplicate publishes. The consumer is **idempotent**:
@@ -165,7 +165,7 @@ ORDER BY "CreatedDate" DESC;
 
 The publisher implements **Transactional Outbox** with **at-least-once delivery**.
 
-In rare crash scenarios it’s possible for the worker to successfully publish to RabbitMQ and crash before the DB row is marked as `Sent`, causing a retry and **duplicate delivery**.
+In rare crash scenarios it's possible for the worker to successfully publish to RabbitMQ and crash before the DB row is marked as `Sent`, causing a retry and **duplicate delivery**.
 
 **Consumers must be idempotent** (here: **`Order.Status == Processed`**, optionally extended with a **`ProcessedMessages`** table keyed by message id).
 
@@ -211,3 +211,15 @@ ORDER BY "CreatedDate" DESC;
 7. Order processing worker → order `Processed`
 8. Duplicate `OrderSubmitted` (republish same body) → still `Processed`, no double processing
 9. `dotnet build Entravel.slnx` succeeds
+
+## Known limitations and trade-offs
+
+- **RabbitMQ publisher creates a new connection per publish.** `RabbitMqPublisher` opens a TCP connection and channel for each outbox message. In a production system this would use a long-lived shared connection with channel pooling. Kept simple intentionally for this demo scope.
+
+- **Orders stuck in `Processing` have no automatic recovery.** If the order processing worker crashes after transitioning an order to `Processing` but before completing, the order remains in that state indefinitely and incoming duplicate messages will be continuously nacked and requeued. A production system would add a timeout-based status reset, mirroring the outbox `ProcessingTimeout` pattern. Out of scope for this task.
+
+- **The `Processing` status is applied in-memory only — not persisted.** The domain model transitions through `Pending → Processing → Processed` during the handler flow, but only the final `Processed` state is written to the database. Observers polling the DB will see the order go directly from `Pending` to `Processed`. This is intentional: the row lock (`SELECT ... FOR UPDATE`) already prevents concurrent processing, so persisting the intermediate state adds no correctness benefit at this scale.
+
+- **Validation lives at the API layer only.** FluentValidation runs on the request DTO via ASP.NET Core model validation. A MediatR `ValidationBehavior` pipeline was considered but omitted — for this single-entry-point service the API-layer validation is sufficient and avoids duplication.
+
+- **No automated tests.** The task explicitly asks for a minimal, non-production-grade example. Given the three-day deadline, effort was focused on demonstrating architectural patterns cleanly. Integration tests for the outbox flow and unit tests for domain behaviour would be the natural next step.
