@@ -5,7 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Entravel.EF.DbContext;
 using Entravel.Data.Repositories;
+using Entravel.Data.Outbox;
 using Entravel.EF.MappingProfile;
+using Entravel.EF.Outbox;
 using Entravel.EF.Repositories;
 
 namespace Entravel.EF.Dependencies;
@@ -31,6 +33,7 @@ public static class EntityFrameworkDependencyInjection
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
+        services.AddScoped<IOutboxProcessingRepository, OutboxProcessingRepository>();
 
         AddPersistenceAutoMapper(services);
 

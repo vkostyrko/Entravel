@@ -16,6 +16,18 @@ services:
       timeout: 5s
       retries: 20
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: entravel-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   api:
     build:
       context: .
@@ -29,6 +41,31 @@ services:
       - "8080:8080"
     depends_on:
       postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  outbox-worker:
+    build:
+      context: .
+      dockerfile: Entravel.OutboxWorker/Dockerfile
+    container_name: entravel-outbox-worker
+    environment:
+      DOTNET_ENVIRONMENT: Docker
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=entravel;Username=postgres;Password=postgres
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      Outbox__PollIntervalSeconds: 5
+      Outbox__BatchSize: 10
+      Outbox__MaxRetryCount: 5
+      Outbox__ProcessingTimeoutSeconds: 300
+      Outbox__MaxParallelism: 4
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
 volumes:
