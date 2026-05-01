@@ -58,7 +58,7 @@ public sealed class OrderProcessingRabbitMqDispatcher(
 
             if (outcome == OrderProcessingOutcome.Success)
             {
-                OrderProcessingMetrics.RecordProcessedOrder(message.OrderId, logger);
+                OrderProcessingMetrics.RecordProcessedOrder(message.OrderId, envelope.RabbitMqMessageId, logger);
             }
 
             return outcome switch

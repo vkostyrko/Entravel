@@ -9,11 +9,15 @@ public static class OrderProcessingMetrics
     private static readonly Counter<long> OrdersProcessedCounter = Meter.CreateCounter<long>("orders.processed");
     private static long _processedOrders;
 
-    public static void RecordProcessedOrder(Guid orderId, ILogger logger)
+    public static void RecordProcessedOrder(Guid orderId, string? messageId, ILogger logger)
     {
         var total = Interlocked.Increment(ref _processedOrders);
         OrdersProcessedCounter.Add(1);
-        logger.LogInformation("Processed order {OrderId}. Total processed orders: {ProcessedOrdersCount}", orderId, total);
+        logger.LogInformation(
+            "Processed order {OrderId} MessageId={MessageId}. Total processed orders: {ProcessedOrdersCount}",
+            orderId,
+            messageId,
+            total);
     }
 }
 
