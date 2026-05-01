@@ -24,15 +24,15 @@ public sealed class OutboxProcessingRepository(AppDbContext db) : IOutboxProcess
 
         var rows = await db.Set<OutboxMessageEntity>()
             .FromSqlInterpolated($@"
-SELECT *
-FROM ""OutboxMessages""
-WHERE
-    (""Status"" = {newStatus})
-    OR (""Status"" = {failedStatus} AND ""RetryCount"" < {maxRetryCount})
-    OR (""Status"" = {processingStatus} AND ""UpdatedDate"" IS NOT NULL AND ""UpdatedDate"" < {processingCutoff})
-ORDER BY ""CreatedDate""
-LIMIT {batchSize}
-FOR UPDATE SKIP LOCKED")
+                SELECT *
+                FROM ""OutboxMessages""
+                WHERE
+                    (""Status"" = {newStatus})
+                    OR (""Status"" = {failedStatus} AND ""RetryCount"" < {maxRetryCount})
+                    OR (""Status"" = {processingStatus} AND ""UpdatedDate"" IS NOT NULL AND ""UpdatedDate"" < {processingCutoff})
+                ORDER BY ""CreatedDate""
+                LIMIT {batchSize}
+                FOR UPDATE SKIP LOCKED")
             .ToListAsync(cancellationToken);
 
         if (rows.Count == 0)
@@ -64,7 +64,7 @@ FOR UPDATE SKIP LOCKED")
 
     public Task MarkSentAsync(Guid id, DateTime utcNow, CancellationToken cancellationToken) =>
         db.Set<OutboxMessageEntity>()
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == id && x.Status == OutboxMessageStatus.Processing)
             .ExecuteUpdateAsync(updates => updates
                 .SetProperty(x => x.Status, OutboxMessageStatus.Sent)
                 .SetProperty(x => x.SentDate, utcNow)
@@ -74,7 +74,7 @@ FOR UPDATE SKIP LOCKED")
     public async Task MarkFailedAsync(Guid id, string lastError, int maxRetryCount, DateTime utcNow, CancellationToken cancellationToken)
     {
         var entity = await db.Set<OutboxMessageEntity>()
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == id && x.Status == OutboxMessageStatus.Processing)
             .Select(x => new { x.Id, x.RetryCount })
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -87,7 +87,7 @@ FOR UPDATE SKIP LOCKED")
         var nextStatus = newRetryCount < maxRetryCount ? OutboxMessageStatus.New : OutboxMessageStatus.Failed;
 
         await db.Set<OutboxMessageEntity>()
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == id && x.Status == OutboxMessageStatus.Processing)
             .ExecuteUpdateAsync(updates => updates
                 .SetProperty(x => x.Status, nextStatus)
                 .SetProperty(x => x.RetryCount, newRetryCount)

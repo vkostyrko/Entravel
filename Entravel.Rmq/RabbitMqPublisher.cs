@@ -26,8 +26,10 @@ public sealed class RabbitMqPublisher(IOptions<RabbitMqOptions> options, IMessag
         await using var connection = await factory.CreateConnectionAsync(cancellationToken);
         await using var channel = await connection.CreateChannelAsync();
 
+        var exchangeName = _options.ResolvedExchangeName;
+
         await channel.ExchangeDeclareAsync(
-            exchange: _options.Exchange,
+            exchange: exchangeName,
             type: ExchangeType.Topic,
             durable: true,
             autoDelete: false,
@@ -45,7 +47,7 @@ public sealed class RabbitMqPublisher(IOptions<RabbitMqOptions> options, IMessag
         var body = Encoding.UTF8.GetBytes(jsonPayload);
 
         await channel.BasicPublishAsync(
-            exchange: _options.Exchange,
+            exchange: exchangeName,
             routingKey: routingKey,
             mandatory: false,
             basicProperties: props,

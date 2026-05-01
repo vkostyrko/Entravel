@@ -7,6 +7,8 @@ public sealed class SubmitOrderCommandValidator : AbstractValidator<SubmitOrderC
 {
     private const int MinQuantity = 1;
     private const decimal MinTotalAmount = 0.01m;
+    private const decimal MinDiscount = 0m;
+    private const decimal MaxDiscount = 100m;
 
     public SubmitOrderCommandValidator()
     {
@@ -32,6 +34,10 @@ public sealed class SubmitOrderCommandValidator : AbstractValidator<SubmitOrderC
         RuleFor(command => command.TotalAmount)
             .GreaterThanOrEqualTo(MinTotalAmount)
             .WithMessage(ValidationMessages.TotalAmountMustBePositive);
+
+        RuleFor(command => command.Discount)
+            .InclusiveBetween(MinDiscount, MaxDiscount)
+            .WithMessage("Discount must be between 0 and 100.");
     }
 }
 

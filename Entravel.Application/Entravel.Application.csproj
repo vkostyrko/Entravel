@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Entravel.Common\Entravel.Common.csproj" />
+    <ProjectReference Include="..\Entravel.Contracts\Entravel.Contracts.csproj" />
     <ProjectReference Include="..\Entravel.Domain\Entravel.Domain.csproj" />
     <ProjectReference Include="..\Entravel.Data\Entravel.Data.csproj" />
   </ItemGroup>
@@ -9,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
   </ItemGroup>
 
   <PropertyGroup>

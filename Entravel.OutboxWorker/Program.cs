@@ -18,8 +18,8 @@ builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
 builder.Services.AddOptions<OutboxPublisherOptions>()
     .Bind(builder.Configuration.GetSection("Outbox"));
 
+builder.Services.AddHostedService<ApplyMigrationsHostedService>();
 builder.Services.AddHostedService<OutboxPublisherBackgroundService>();
-builder.Services.AddHostedService<StartupMigratorHostedService>();
 
 var host = builder.Build();
 host.Run();

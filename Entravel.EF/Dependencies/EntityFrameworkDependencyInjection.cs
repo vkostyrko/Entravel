@@ -8,6 +8,8 @@ using Entravel.Data.Repositories;
 using Entravel.Data.Outbox;
 using Entravel.EF.MappingProfile;
 using Entravel.EF.Outbox;
+using Entravel.Data.Queries;
+using Entravel.EF.Queries;
 using Entravel.EF.Repositories;
 
 namespace Entravel.EF.Dependencies;
@@ -32,6 +34,8 @@ public static class EntityFrameworkDependencyInjection
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderReadRepository, OrderReadRepository>();
+        services.AddScoped<IOrderProcessingRepository, OrderProcessingRepository>();
         services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
         services.AddScoped<IOutboxProcessingRepository, OutboxProcessingRepository>();
 

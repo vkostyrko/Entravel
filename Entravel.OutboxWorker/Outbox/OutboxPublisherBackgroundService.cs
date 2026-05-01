@@ -6,9 +6,8 @@ using Microsoft.Extensions.Options;
 namespace Entravel.OutboxWorker.Outbox;
 
 public sealed class OutboxPublisherBackgroundService(
-    IOutboxProcessingRepository outboxRepository,
-    IRabbitMqPublisher publisher,
     IServiceScopeFactory scopeFactory,
+    IRabbitMqPublisher publisher,
     IOptions<OutboxPublisherOptions> options,
     ILogger<OutboxPublisherBackgroundService> logger)
     : BackgroundService
@@ -29,12 +28,17 @@ public sealed class OutboxPublisherBackgroundService(
             {
                 var utcNow = DateTime.UtcNow;
 
-                var batch = await outboxRepository.ClaimBatchAsync(
-                    batchSize: _options.BatchSize,
-                    maxRetryCount: _options.MaxRetryCount,
-                    processingTimeout: processingTimeout,
-                    utcNow: utcNow,
-                    cancellationToken: stoppingToken);
+                IReadOnlyList<OutboxMessageToPublish> batch;
+                await using (var claimScope = scopeFactory.CreateAsyncScope())
+                {
+                    var outboxRepository = claimScope.ServiceProvider.GetRequiredService<IOutboxProcessingRepository>();
+                    batch = await outboxRepository.ClaimBatchAsync(
+                        batchSize: _options.BatchSize,
+                        maxRetryCount: _options.MaxRetryCount,
+                        processingTimeout: processingTimeout,
+                        utcNow: utcNow,
+                        cancellationToken: stoppingToken);
+                }
 
                 if (batch.Count == 0)
                 {
@@ -103,4 +107,3 @@ public sealed class OutboxPublisherBackgroundService(
         }
     }
 }
-

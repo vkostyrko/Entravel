@@ -33,6 +33,14 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderE
             .HasPrecision(18, 2)
             .IsRequired();
 
+        builder.Property(order => order.Discount)
+            .HasPrecision(5, 2)
+            .IsRequired();
+
+        builder.Property(order => order.FinalAmount)
+            .HasPrecision(18, 2)
+            .IsRequired(false);
+
         builder.Property(order => order.Status)
             .HasConversion<string>()
             .HasMaxLength(32)

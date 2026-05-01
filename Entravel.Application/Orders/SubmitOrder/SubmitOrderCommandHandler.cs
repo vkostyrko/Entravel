@@ -28,25 +28,21 @@ public sealed class SubmitOrderCommandHandler(
 
     private static Order CreateOrderWithItems(SubmitOrderCommand command, Guid orderId, DateTime now)
     {
-        var order = new Order
-        {
-            Id = orderId,
-            CustomerId = command.CustomerId,
-            TotalAmount = command.TotalAmount,
-            Status = OrderStatus.Pending,
-            CreatedDate = now
-        };
+        var order = Order.CreateSubmitted(
+            id: orderId,
+            customerId: command.CustomerId,
+            totalAmount: command.TotalAmount,
+            discount: command.Discount,
+            utcNow: now);
 
         foreach (var requestItem in command.Items)
         {
-            order.Items.Add(new OrderItem
-            {
-                Id = Guid.NewGuid(),
-                OrderId = orderId,
-                InventoryId = requestItem.InventoryId,
-                Quantity = requestItem.Quantity,
-                CreatedDate = now
-            });
+            order.AddItem(OrderItem.Create(
+                id: Guid.NewGuid(),
+                orderId: orderId,
+                inventoryId: requestItem.InventoryId,
+                quantity: requestItem.Quantity,
+                utcNow: now));
         }
 
         return order;

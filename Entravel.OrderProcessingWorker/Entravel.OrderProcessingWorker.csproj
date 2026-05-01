@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Entravel.OrderProcessingWorker-5cf2787d-8a8d-489c-9f91-ae388a725afe</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Entravel.Application\Entravel.Application.csproj" />
+    <ProjectReference Include="..\Entravel.EF\Entravel.EF.csproj" />
+    <ProjectReference Include="..\Entravel.Rmq\Entravel.Messaging.csproj" />
+  </ItemGroup>
+</Project>

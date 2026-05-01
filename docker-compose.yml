@@ -39,6 +39,11 @@ services:
       ConnectionStrings__DefaultConnection: Host=postgres;Database=entravel;Username=postgres;Password=postgres
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
     depends_on:
       postgres:
         condition: service_healthy
@@ -66,6 +71,35 @@ services:
       postgres:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+  order-processing-worker:
+    build:
+      context: .
+      dockerfile: Entravel.OrderProcessingWorker/Dockerfile
+    container_name: entravel-order-processing-worker
+    environment:
+      DOTNET_ENVIRONMENT: Docker
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=entravel;Username=postgres;Password=postgres
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      RabbitMq__ExchangeName: entravel.events
+      RabbitMq__PrefetchCount: 10
+      RabbitMq__Subscriptions__0__QueueName: entravel.order-processing
+      RabbitMq__Subscriptions__0__ExchangeName: entravel.events
+      RabbitMq__Subscriptions__0__ExchangeType: topic
+      RabbitMq__Subscriptions__0__RoutingKey: orders.submitted
+      RabbitMq__Subscriptions__0__MessageType: OrderSubmitted
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      api:
         condition: service_healthy
 
 volumes:

@@ -9,21 +9,40 @@ public static class DatabaseInitializer
 {
     private static readonly string[] AllowedEnvironments = ["Development", "Docker", "Local"];
 
-    public static async Task ApplyMigrationsAndSeedAsync(IServiceProvider services, string environmentName, CancellationToken cancellationToken = default)
+    public static async Task ApplyMigrationsAsync(IServiceProvider services, string environmentName, CancellationToken cancellationToken = default)
     {
-        if (!AllowedEnvironments.Contains(environmentName, StringComparer.OrdinalIgnoreCase))
+        if (!IsAllowedEnvironment(environmentName))
         {
             return;
         }
 
         await using var scope = services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
         await db.Database.MigrateAsync(cancellationToken);
-        await SeedAsync(db, cancellationToken);
     }
 
-    private static async Task SeedAsync(AppDbContext db, CancellationToken cancellationToken)
+    public static async Task SeedAsync(IServiceProvider services, string environmentName, CancellationToken cancellationToken = default)
+    {
+        if (!IsAllowedEnvironment(environmentName))
+        {
+            return;
+        }
+
+        await using var scope = services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await SeedCoreAsync(db, cancellationToken);
+    }
+
+    public static async Task InitializeAsync(IServiceProvider services, string environmentName, CancellationToken cancellationToken = default)
+    {
+        await ApplyMigrationsAsync(services, environmentName, cancellationToken);
+        await SeedAsync(services, environmentName, cancellationToken);
+    }
+
+    private static bool IsAllowedEnvironment(string environmentName) =>
+        AllowedEnvironments.Contains(environmentName, StringComparer.OrdinalIgnoreCase);
+
+    private static async Task SeedCoreAsync(AppDbContext db, CancellationToken cancellationToken)
     {
         await SeedCustomersAsync(db, cancellationToken);
         await SeedInventoryAsync(db, cancellationToken);
@@ -62,4 +81,3 @@ public static class DatabaseInitializer
         );
     }
 }
-

@@ -18,6 +18,7 @@
   </Folder>
   <Folder Name="/Jobs/">
     <Project Path="Entravel.OutboxWorker/Entravel.OutboxWorker.csproj" />
+    <Project Path="Entravel.OrderProcessingWorker/Entravel.OrderProcessingWorker.csproj" />
   </Folder>
   <Project Path="Entravel.Common/Entravel.Common.csproj" />
 </Solution>
