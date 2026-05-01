@@ -5,7 +5,6 @@ using Entravel.API.Validation;
 using Entravel.EF.Dependencies;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,17 +18,24 @@ builder.Services.AddValidatorsFromAssemblyContaining<SubmitOrderCommand>();
 builder.Services.AddValidatorsFromAssemblyContaining<SubmitOrderRequestValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.ConfigureMappings();
-builder.Services.AddEfInfrastructure();
+builder.Services.AddEfInfrastructure(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsEnvironment("Docker"))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
+
+await app.ApplyDatabaseMigrationsAndSeedAsync();
 
 app.Run();

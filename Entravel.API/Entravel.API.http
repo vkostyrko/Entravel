@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:8080
+
+###
+# Health
+GET {{baseUrl}}/health
+
+###
+# Submit order (valid) - uses seeded Customer + Inventory IDs
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "customerId": "11111111-1111-1111-1111-111111111111",
+  "items": [
+    { "inventoryId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "quantity": 1 },
+    { "inventoryId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "quantity": 2 }
+  ],
+  "totalAmount": 88.99
+}
+
+###
+# Submit order (invalid) - should return 400 with validation errors
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "customerId": "00000000-0000-0000-0000-000000000000",
+  "items": [],
+  "totalAmount": 0
+}
+

@@ -15,6 +15,11 @@ public static class EntityFrameworkDependencyInjection
     public static IServiceCollection AddEfInfrastructure(this IServiceCollection services)
     {
         var configuration = BuildEfConfiguration();
+        return services.AddEfInfrastructure(configuration);
+    }
+
+    public static IServiceCollection AddEfInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         if (string.IsNullOrWhiteSpace(connectionString))

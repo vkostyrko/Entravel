@@ -24,6 +24,11 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderE
         builder.Property(order => order.CustomerId)
             .IsRequired();
 
+        builder.HasOne(order => order.Customer)
+            .WithMany()
+            .HasForeignKey(order => order.CustomerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(order => order.TotalAmount)
             .HasPrecision(18, 2)
             .IsRequired();
@@ -38,5 +43,6 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderE
             .HasForeignKey(orderItem => orderItem.OrderId);
 
         builder.HasIndex(order => order.Status);
+        builder.HasIndex(order => order.CustomerId);
     }
 }
